@@ -10,11 +10,11 @@ export interface SourceDef {
 export const SOURCES: SourceDef[] = [
   { name: 'webinar_registrants', label: 'Registrants — table' },
   { name: 'webinar_events', label: 'Events — table' },
-  { name: 'v_webinar_registrants_with_event', label: 'Registrants + live event — view' },
   { name: 'v_all_registrants', label: 'All registrants — view' },
+  { name: 'v_registered', label: 'Registered — view' },
   { name: 'v_unregistered', label: 'Unregistered — view' },
-  { name: 'v_scheduled_registrants', label: 'Scheduled registrants — view' },
-  { name: 'v_webinar_no_shows', label: 'No-shows — view' },
+  { name: 'v_no_show', label: 'No-shows — view' },
+  { name: 'v_test', label: 'Test — view' },
 ];
 
 // Free-text search runs ILIKE across whichever of these columns exist in the source.

@@ -44,7 +44,6 @@ service-role key — it never reaches the browser. Auth uses the public anon key
    - `SUPABASE_SERVICE_ROLE_KEY`  ← keep this one secret; it's server-only
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `N8N_WEBINAR_WEBHOOK_URL`  ← server-only; fired when a webinar is created
 4. Deploy. Add users in Supabase → Authentication → Users to grant access.
 5. In Supabase → Authentication → URL Configuration, add your Vercel domain to the allowed
    redirect/site URLs (so auth cookies work on the deployed domain).
@@ -77,21 +76,6 @@ lib/query.ts                 search/filter/sort param parsing + query builder
 lib/schema.ts                sources list + filter/column display config
 components/Explorer.tsx       the whole client UI (table, filters, pager, CRUD drawer, toasts)
 ```
-
-## New-webinar → backfill flow
-
-Creating a webinar (events table → **+ New webinar**) always sets `webinar_status = Scheduled`
-(fixed, not a dropdown). On insert, the server `POST`s `{ webinarId, webinar }` to
-`N8N_WEBINAR_WEBHOOK_URL`. The n8n workflow **"Webinar Created → Backfill Unregistered (Supabase)"**
-(she-sells-n8n, id `544uahWDCgdc3mGo`, webhook path `/webhook/webinar-created-backfill`) then runs a
-single Supabase `PATCH` that stamps every `is_registrant = false` row with the new `event_id` and
-sets `is_registrant = true` — i.e. binds all currently-unregistered leads to the new webinar.
-
-- The webhook does **not** touch each registrant's own `id`; it writes the FK column `event_id`.
-- Verified safe: 0 duplicate emails among unregistered rows, so the `(email, event_id)` unique
-  index won't be violated when they all get the same `event_id`.
-- The n8n workflow holds the Supabase service-role key in its HTTP headers — it's a backend secret
-  there, same pattern as the existing Close workflows on that instance.
 
 ## Notes
 

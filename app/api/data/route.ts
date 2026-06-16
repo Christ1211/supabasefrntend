@@ -60,22 +60,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
     const inserted = data?.[0] ?? null;
 
-    // New webinar → notify the n8n webhook, which back-fills unregistered leads onto this event.
-    let webhook: { ok: boolean; status?: number; error?: string } | null = null;
-    if (source === 'webinar_events' && inserted?.id && process.env.N8N_WEBINAR_WEBHOOK_URL) {
-      try {
-        const r = await fetch(process.env.N8N_WEBINAR_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ webinarId: inserted.id, webinar: inserted }),
-        });
-        webhook = { ok: r.ok, status: r.status };
-      } catch (e: any) {
-        webhook = { ok: false, error: e?.message ?? String(e) };
-      }
-    }
-
-    return NextResponse.json({ row: inserted, webhook });
+    return NextResponse.json({ row: inserted });
   } catch (err: any) {
     return bad(err.message ?? String(err), 500);
   }
